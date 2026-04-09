@@ -1,0 +1,18 @@
+definition_version: "2"
+entities:
+  sis_pg_app:
+    type: streamlit
+    stage: sis_pg_app_stage
+    main_file: streamlit_app.py
+    query_warehouse: COMPUTE_WH
+    compute_pool: SYSTEM_COMPUTE_POOL_CPU
+    runtime_name: SYSTEM$ST_CONTAINER_RUNTIME_PY3_11
+    external_access_integrations:
+      - CHANINN_SIS_PG_EAI
+    secrets:
+      pg_secret: CHANINN_SIS_PG_SECRET
+    artifacts:
+      - streamlit_app.py
+      - src/
+      - .streamlit/secrets.toml
+      - pyproject.toml

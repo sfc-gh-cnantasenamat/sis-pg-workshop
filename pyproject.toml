@@ -1,0 +1,8 @@
+[project]
+name = "sis-pg-workshop"
+version = "0.1.0"
+dependencies = [
+    "psycopg2-binary",
+    "streamlit>=1.50.0",
+    "snowflake-snowpark-python",
+]

@@ -1,0 +1,3 @@
+psycopg2-binary
+streamlit>=1.50.0
+snowflake-snowpark-python
