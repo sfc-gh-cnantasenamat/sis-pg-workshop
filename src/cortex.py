@@ -1,9 +1,21 @@
 from snowflake.snowpark import Session
+import streamlit as st
 
 
 def get_snowpark_session():
-    """Get a Snowpark session from within SiS container runtime."""
-    return Session.builder.getOrCreate()
+    """Get a Snowpark session, works in both SiS container runtime and Community Cloud."""
+    try:
+        return Session.builder.getOrCreate()
+    except Exception:
+        # Fallback for Community Cloud: build session from secrets
+        creds = st.secrets["snowflake"]
+        return Session.builder.configs({
+            "account": creds["account"],
+            "user": creds["user"],
+            "password": creds["password"],
+            "warehouse": creds.get("warehouse", "COMPUTE_WH"),
+            "role": creds.get("role", "ACCOUNTADMIN"),
+        }).create()
 
 
 def cortex_complete(prompt, model="mistral-large2"):
