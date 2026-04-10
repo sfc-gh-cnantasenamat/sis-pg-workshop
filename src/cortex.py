@@ -19,7 +19,7 @@ def get_snowpark_session():
     return Session.builder.getOrCreate()
 
 
-def cortex_complete(prompt, model="claude-sonnet-4"):
+def cortex_complete(prompt, model="claude-sonnet-4-6"):
     """Call Snowflake Cortex COMPLETE function via Snowpark SQL."""
     session = get_snowpark_session()
     prompt_escaped = prompt.replace("'", "''")

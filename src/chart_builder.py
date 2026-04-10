@@ -17,7 +17,7 @@ def render():
         placeholder="e.g., Show monthly revenue as a bar chart"
     )
 
-    model = st.selectbox("Model", ["claude-sonnet-4", "gpt-4o", "llama3.1-8b"])
+    model = st.selectbox("Model", ["claude-sonnet-4-6", "mistral-large2", "llama3.1-8b"])
 
     if st.button("Generate Chart") and user_request:
         with st.spinner("Generating chart..."):

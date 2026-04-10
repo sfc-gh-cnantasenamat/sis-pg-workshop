@@ -14,7 +14,7 @@ def render():
     # --- Model selection ---
     model = st.sidebar.selectbox(
         "Chatbot Model",
-        ["claude-sonnet-4", "gpt-4o", "llama3.1-8b"],
+        ["claude-sonnet-4-6", "mistral-large2", "llama3.1-8b"],
         key="chatbot_model"
     )
 
