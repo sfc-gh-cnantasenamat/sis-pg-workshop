@@ -2,27 +2,44 @@ import psycopg2
 import streamlit as st
 
 
+@st.cache_resource
 def get_connection():
-    """Get a Postgres connection using Streamlit secrets."""
+    """Get a persistent Postgres connection (cached across reruns)."""
     creds = st.secrets["postgres"]
-    return psycopg2.connect(
+    conn = psycopg2.connect(
         host=creds["host"],
         port=creds["port"],
         dbname=creds["dbname"],
         user=creds["user"],
         password=creds["password"]
     )
+    conn.autocommit = True
+    return conn
 
 
 def run_query(sql, params=None):
     """Execute a query and return results as a list of dicts."""
     conn = get_connection()
+    # Reconnect if the connection was closed or broken
+    if conn.closed:
+        st.cache_resource.clear()
+        conn = get_connection()
     cur = conn.cursor()
-    cur.execute(sql, params)
-    columns = [desc[0] for desc in cur.description]
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
+    try:
+        cur.execute(sql, params)
+        columns = [desc[0] for desc in cur.description]
+        rows = cur.fetchall()
+    except psycopg2.OperationalError:
+        # Connection lost mid-query, reconnect and retry once
+        conn.close()
+        st.cache_resource.clear()
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(sql, params)
+        columns = [desc[0] for desc in cur.description]
+        rows = cur.fetchall()
+    finally:
+        cur.close()
     return [dict(zip(columns, row)) for row in rows]
 
 
@@ -36,6 +53,7 @@ def get_tables():
     """)
 
 
+@st.cache_data(ttl=300)
 def get_schema_context():
     """Build a text description of all tables and columns for LLM prompts."""
     tables = get_tables()
